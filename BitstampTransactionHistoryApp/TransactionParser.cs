@@ -4,10 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using System.Net.Http;
+using System.Web.Script.Serialization;
 
 namespace BitstampTransactionHistoryApp {
     class TransactionParser {
         private static readonly string URL = "https://www.bitstamp.net/api/v2/user_transactions/";
+        private static readonly HttpClient client = new HttpClient();
         private string apiKey, apiSecret, customerId;
 
         public TransactionParser(string apiKey, string apiSecret, string customerId) {
@@ -16,10 +19,25 @@ namespace BitstampTransactionHistoryApp {
             this.customerId = customerId;
         }
 
-        private String DownloadJSONResponse() {
+        public Transaction[] ParseTransactions() {
+            string response = ParseJSONResponse();
+            var serializer = new JavaScriptSerializer();
+            var obj = (Dictionary<string, object>) serializer.DeserializeObject(response);
+
+
+        }
+
+        private string ParseJSONResponse() {
             string nonce = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
             string signature = CreateSignature(nonce);
-            return null;
+            var parameters = new Dictionary<string, string> {
+                {"key", apiKey},
+                {"signature", signature},
+                {"nonce", nonce}
+            };
+            var encoded = new FormUrlEncodedContent(parameters);
+            var response = client.PostAsync(URL, encoded);
+            return response.Result.Content.ReadAsStringAsync().Result;
         }
 
         private string CreateSignature(string nonce) {
