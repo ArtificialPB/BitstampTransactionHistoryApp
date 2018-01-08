@@ -12,15 +12,12 @@ namespace BitstampTransactionHistoryApp
     using System;
     using System.Collections.Generic;
     
-    public partial class Transaction
+    public partial class PublicTransaction
     {
-        public int id { get; set; }
-        public System.DateTime datetime { get; set; }
-        public decimal usd { get; set; }
-        public decimal eur { get; set; }
-        public decimal btc { get; set; }
-        public string btc_usd { get; set; }
-        public decimal fee { get; set; }
-        public int order_id { get; set; }
+        public int tid { get; set; }
+        public byte[] date { get; set; }
+        public decimal price { get; set; }
+        public decimal amount { get; set; }
+        public bool type { get; set; }
     }
 }

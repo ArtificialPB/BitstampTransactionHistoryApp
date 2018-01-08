@@ -13,7 +13,7 @@ namespace BitstampTransactionHistoryApp {
         static void Main() {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TransactionsViewForm());
+            Application.Run(new PrivateTransactionsView());
         }
     }
 }

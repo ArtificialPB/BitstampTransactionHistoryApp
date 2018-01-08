@@ -4,40 +4,65 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="TransactionHistoriesModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="Transaction">
+    <Schema Namespace="TransactionHistoriesModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="PublicTransactions">
           <Key>
-            <PropertyRef Name="TransactionId" />
+            <PropertyRef Name="tid" />
           </Key>
-          <Property Name="TransactionId" Type="int" Nullable="false" />
-          <Property Name="TradePair" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="Date" Type="datetime" Nullable="false" />
-          <Property Name="AmountUSD" Type="decimal" Precision="18" Scale="4" Nullable="false" />
-          <Property Name="TradeType" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="Fee" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="tid" Type="int" Nullable="false" />
+          <Property Name="date" Type="timestamp" StoreGeneratedPattern="Computed" Nullable="false" />
+          <Property Name="price" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="amount" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="type" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Transactions">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="datetime" Type="datetime" Nullable="false" />
+          <Property Name="usd" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="eur" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="btc" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="btc_usd" Type="nchar" MaxLength="10" Nullable="false" />
+          <Property Name="fee" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="order_id" Type="int" Nullable="false" />
         </EntityType>
         <EntityContainer Name="TransactionHistoriesModelStoreContainer">
-          <EntitySet Name="Transaction" EntityType="Self.Transaction" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PublicTransactions" EntityType="Self.PublicTransactions" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Transactions" EntityType="Self.Transactions" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="TransactionHistoriesModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="TransactionHistoriesEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Transactions" EntityType="TransactionHistoriesModel.Transaction" />
+          <EntitySet Name="PublicTransactions" EntityType="TransactionHistoriesModel.PublicTransaction" />
+        </EntityContainer>
         <EntityType Name="Transaction">
           <Key>
-            <PropertyRef Name="TransactionId" />
+            <PropertyRef Name="id" />
           </Key>
-          <Property Name="TransactionId" Type="Int32" Nullable="false" />
-          <Property Name="TradePair" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="AmountUSD" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
-          <Property Name="TradeType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Fee" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="datetime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="usd" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
+          <Property Name="eur" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
+          <Property Name="btc" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
+          <Property Name="btc_usd" Type="String" Nullable="false" MaxLength="10" FixedLength="true" Unicode="true" />
+          <Property Name="fee" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
+          <Property Name="order_id" Type="Int32" Nullable="false" />
         </EntityType>
-        <EntityContainer Name="TransactionHistoriesEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="Transactions" EntityType="Self.Transaction" />
-        </EntityContainer>
+        <EntityType Name="PublicTransaction">
+          <Key>
+            <PropertyRef Name="tid" />
+          </Key>
+          <Property Name="tid" Type="Int32" Nullable="false" />
+          <Property Name="date" Type="Binary" Nullable="false" MaxLength="8" FixedLength="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="price" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
+          <Property Name="amount" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
+          <Property Name="type" Type="Boolean" Nullable="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -46,13 +71,26 @@
         <EntityContainerMapping StorageEntityContainer="TransactionHistoriesModelStoreContainer" CdmEntityContainer="TransactionHistoriesEntities">
           <EntitySetMapping Name="Transactions">
             <EntityTypeMapping TypeName="TransactionHistoriesModel.Transaction">
-              <MappingFragment StoreEntitySet="Transaction">
-                <ScalarProperty Name="TransactionId" ColumnName="TransactionId" />
-                <ScalarProperty Name="TradePair" ColumnName="TradePair" />
-                <ScalarProperty Name="Date" ColumnName="Date" />
-                <ScalarProperty Name="AmountUSD" ColumnName="AmountUSD" />
-                <ScalarProperty Name="TradeType" ColumnName="TradeType" />
-                <ScalarProperty Name="Fee" ColumnName="Fee" />
+              <MappingFragment StoreEntitySet="Transactions">
+                <ScalarProperty Name="order_id" ColumnName="order_id" />
+                <ScalarProperty Name="fee" ColumnName="fee" />
+                <ScalarProperty Name="btc_usd" ColumnName="btc_usd" />
+                <ScalarProperty Name="btc" ColumnName="btc" />
+                <ScalarProperty Name="eur" ColumnName="eur" />
+                <ScalarProperty Name="usd" ColumnName="usd" />
+                <ScalarProperty Name="datetime" ColumnName="datetime" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PublicTransactions">
+            <EntityTypeMapping TypeName="TransactionHistoriesModel.PublicTransaction">
+              <MappingFragment StoreEntitySet="PublicTransactions">
+                <ScalarProperty Name="type" ColumnName="type" />
+                <ScalarProperty Name="amount" ColumnName="amount" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="date" ColumnName="date" />
+                <ScalarProperty Name="tid" ColumnName="tid" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

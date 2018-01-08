@@ -6,6 +6,7 @@
     <edmx:Diagrams>
       <Diagram DiagramId="ce1a2181a31d4404835a601c82354ac6" Name="Diagram1">
         <EntityTypeShape EntityType="TransactionHistoriesModel.Transaction" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="TransactionHistoriesModel.PublicTransaction" Width="1.5" PointX="3.375" PointY="0.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

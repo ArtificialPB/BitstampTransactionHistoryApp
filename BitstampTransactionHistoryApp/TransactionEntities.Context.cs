@@ -26,5 +26,6 @@ namespace BitstampTransactionHistoryApp
         }
     
         public virtual DbSet<Transaction> Transactions { get; set; }
+        public virtual DbSet<PublicTransaction> PublicTransactions { get; set; }
     }
 }

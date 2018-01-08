@@ -9,7 +9,7 @@ using System.Web.Script.Serialization;
 
 namespace BitstampTransactionHistoryApp {
     class TransactionParser {
-        private static readonly string URL = "https://www.bitstamp.net/api/v2/user_transactions/";
+        private static readonly string API_URL = "https://www.bitstamp.net/api/v2/";
         private static readonly HttpClient client = new HttpClient();
         private string apiKey, apiSecret, customerId;
 
@@ -19,24 +19,73 @@ namespace BitstampTransactionHistoryApp {
             this.customerId = customerId;
         }
 
-        public Transaction[] ParseTransactions() {
-            string response = ParseJSONResponse();
+        //Parses new transactions
+        public List<Transaction> ParsePrivateTransactions() {
+            string response = GetJSONResponse("user_transactions");
             var serializer = new JavaScriptSerializer();
-            var obj = (Dictionary<string, object>) serializer.DeserializeObject(response);
-
-
+            var transactions = serializer.Deserialize<List<Transaction>>(response);
+            return transactions;
         }
 
-        private string ParseJSONResponse() {
-            string nonce = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
-            string signature = CreateSignature(nonce);
-            var parameters = new Dictionary<string, string> {
-                {"key", apiKey},
-                {"signature", signature},
-                {"nonce", nonce}
-            };
+        //Prases new transactions, adds them to the database, and returns all available transactions
+        public List<Transaction> UpdatedPrivateTransactions() {
+            List<Transaction> parsed = ParsePrivateTransactions();
+            //If it fails to update the database, only return newly parsed transactions
+            List<Transaction> ret = parsed;
+            using (var ctx = new TransactionHistoriesEntities()) {
+                foreach (var transaction in parsed) {
+                    if (!ctx.Transactions.Any(t => t.id == transaction.id)) {
+                        ctx.Transactions.Add(transaction);
+                    }
+                }
+                ret = ctx.Transactions.ToList();
+                ctx.SaveChanges();
+            }
+            return ret;
+        }
+
+        //Parses new transactions
+        public List<PublicTransaction> ParsePublicTransactionsFor(string pair) { 
+            string response = GetJSONResponse("transactions/"+pair);
+            var serializer = new JavaScriptSerializer();
+            var transactions = serializer.Deserialize<List<PublicTransaction>>(response);
+            return transactions;
+        }
+
+        //Prases new transactions, adds them to the database, and returns all available transactions
+        public List<PublicTransaction> UpdatedPublicTransactions(string pair) {
+            List<PublicTransaction> parsed = ParsePublicTransactionsFor(pair);
+            //If it fails to update the database, only return newly parsed transactions
+            List<PublicTransaction> ret = parsed;
+            using (var ctx = new TransactionHistoriesEntities()) {
+                foreach (var transaction in parsed) {
+                    if (!ctx.PublicTransactions.Any(t => t.tid == transaction.tid)) {
+                        ctx.PublicTransactions.Add(transaction);
+                    }
+                }
+                ret = ctx.PublicTransactions.ToList();
+                ctx.SaveChanges();
+            }
+            return ret;
+        }
+
+        //Overload function to make a call without any additional POST parameters
+        private string GetJSONResponse(string function) {
+            return GetJSONResponse(function, new Dictionary<string, string>());
+        }
+
+        private string GetJSONResponse(string function, Dictionary<string, string> parameters) {
+            //provides an option to parse public data
+            if (apiKey != null) {
+                string nonce = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+                string signature = CreateSignature(nonce);
+                //Add required auth parameters
+                parameters.Add("key", apiKey);
+                parameters.Add("signature", signature);
+                parameters.Add("nonce", nonce);
+            }
             var encoded = new FormUrlEncodedContent(parameters);
-            var response = client.PostAsync(URL, encoded);
+            var response = client.PostAsync(API_URL + function + "/", encoded);
             return response.Result.Content.ReadAsStringAsync().Result;
         }
 

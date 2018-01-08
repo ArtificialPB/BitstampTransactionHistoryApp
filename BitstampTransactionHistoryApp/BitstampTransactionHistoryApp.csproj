@@ -48,10 +48,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -70,6 +70,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PrivateTransactionsView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PrivateTransactionsView.Designer.cs">
+      <DependentUpon>PrivateTransactionsView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PublicTransaction.cs">
+      <DependentUpon>TransactionEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="Transaction.cs">
       <DependentUpon>TransactionEntities.tt</DependentUpon>
     </Compile>
@@ -89,14 +98,12 @@
       <DependentUpon>TransactionEntities.edmx</DependentUpon>
     </Compile>
     <Compile Include="TransactionParser.cs" />
-    <Compile Include="TransactionsViewForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TransactionsViewForm.Designer.cs">
-      <DependentUpon>TransactionsViewForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransactionType.cs" />
+    <EmbeddedResource Include="PrivateTransactionsView.resx">
+      <DependentUpon>PrivateTransactionsView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -106,9 +113,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="TransactionsViewForm.resx">
-      <DependentUpon>TransactionsViewForm.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

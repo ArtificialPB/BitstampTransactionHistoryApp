@@ -9,9 +9,13 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace BitstampTransactionHistoryApp {
-    public partial class TransactionsViewForm : Form {
-        public TransactionsViewForm() {
+    public partial class PrivateTransactionsView : Form {
+        public PrivateTransactionsView() {
             InitializeComponent();
+        }
+
+        private void PrivateTransactionsView_Load(object sender, EventArgs e) {
+
         }
     }
 }
