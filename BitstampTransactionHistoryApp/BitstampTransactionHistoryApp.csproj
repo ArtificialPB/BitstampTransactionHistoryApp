@@ -79,6 +79,13 @@
     <Compile Include="PublicTransaction.cs">
       <DependentUpon>TransactionEntities.tt</DependentUpon>
     </Compile>
+    <Compile Include="PublicTransactionsView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PublicTransactionsView.Designer.cs">
+      <DependentUpon>PublicTransactionsView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PublicTransactionType.cs" />
     <Compile Include="Transaction.cs">
       <DependentUpon>TransactionEntities.tt</DependentUpon>
     </Compile>
@@ -101,6 +108,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TransactionType.cs" />
+    <Compile Include="ViewSelectionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ViewSelectionForm.Designer.cs">
+      <DependentUpon>ViewSelectionForm.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="PrivateTransactionsView.resx">
       <DependentUpon>PrivateTransactionsView.cs</DependentUpon>
     </EmbeddedResource>
@@ -113,6 +126,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="PublicTransactionsView.resx">
+      <DependentUpon>PublicTransactionsView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ViewSelectionForm.resx">
+      <DependentUpon>ViewSelectionForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

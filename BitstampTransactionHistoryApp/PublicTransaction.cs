@@ -15,9 +15,9 @@ namespace BitstampTransactionHistoryApp
     public partial class PublicTransaction
     {
         public int tid { get; set; }
-        public byte[] date { get; set; }
         public decimal price { get; set; }
         public decimal amount { get; set; }
-        public bool type { get; set; }
+        public int type { get; set; }
+        public int date { get; set; }
     }
 }

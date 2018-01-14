@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Net.Http;
 using System.Web.Script.Serialization;
+using System.Diagnostics;
+using System.Data.Entity.Validation;
 
 namespace BitstampTransactionHistoryApp {
     class TransactionParser {
@@ -21,7 +23,7 @@ namespace BitstampTransactionHistoryApp {
 
         //Parses new transactions
         public List<Transaction> ParsePrivateTransactions() {
-            string response = GetJSONResponse("user_transactions");
+            string response = PostJSONResponse("user_transactions");
             var serializer = new JavaScriptSerializer();
             var transactions = serializer.Deserialize<List<Transaction>>(response);
             return transactions;
@@ -30,6 +32,8 @@ namespace BitstampTransactionHistoryApp {
         //Prases new transactions, adds them to the database, and returns all available transactions
         public List<Transaction> UpdatedPrivateTransactions() {
             List<Transaction> parsed = ParsePrivateTransactions();
+
+            Debug.Print("Parsed " + parsed.Count() + " transaction");
             //If it fails to update the database, only return newly parsed transactions
             List<Transaction> ret = parsed;
             using (var ctx = new TransactionHistoriesEntities()) {
@@ -38,23 +42,34 @@ namespace BitstampTransactionHistoryApp {
                         ctx.Transactions.Add(transaction);
                     }
                 }
+                try {
+                    ctx.SaveChanges();
+                }
+                catch (DbEntityValidationException e) {
+                    foreach (var eve in e.EntityValidationErrors) {
+                        foreach (var v in eve.ValidationErrors) {
+                            Debug.Print(v.PropertyName + " - " + v.ErrorMessage);
+                        }
+                    }
+                }
                 ret = ctx.Transactions.ToList();
-                ctx.SaveChanges();
             }
             return ret;
         }
 
         //Parses new transactions
-        public List<PublicTransaction> ParsePublicTransactionsFor(string pair) { 
-            string response = GetJSONResponse("transactions/"+pair);
+        public List<PublicTransaction> ParsePublicTransactionsFor(string pair, Dictionary<string, string> parameters) {
+            string response = GetJSONResponse("transactions/" + pair, parameters);
             var serializer = new JavaScriptSerializer();
             var transactions = serializer.Deserialize<List<PublicTransaction>>(response);
             return transactions;
         }
 
+
+
         //Prases new transactions, adds them to the database, and returns all available transactions
-        public List<PublicTransaction> UpdatedPublicTransactions(string pair) {
-            List<PublicTransaction> parsed = ParsePublicTransactionsFor(pair);
+        public List<PublicTransaction> UpdatedPublicTransactions(string pair, Dictionary<string, string> parameters) {
+            List<PublicTransaction> parsed = ParsePublicTransactionsFor(pair, parameters);
             //If it fails to update the database, only return newly parsed transactions
             List<PublicTransaction> ret = parsed;
             using (var ctx = new TransactionHistoriesEntities()) {
@@ -63,21 +78,52 @@ namespace BitstampTransactionHistoryApp {
                         ctx.PublicTransactions.Add(transaction);
                     }
                 }
+                try {
+                    ctx.SaveChanges();
+                }
+                catch (DbEntityValidationException e) {
+                    foreach (var eve in e.EntityValidationErrors) {
+                        foreach (var v in eve.ValidationErrors) {
+                            Debug.Print(v.PropertyName + " - " + v.ErrorMessage);
+                        }
+                    }
+                }
                 ret = ctx.PublicTransactions.ToList();
-                ctx.SaveChanges();
+            }
+            return ret;
+        }
+
+
+
+        private string GetJSONResponse(string function, Dictionary<string, string> parameters) {
+            string url = API_URL + function + "/?" + DictionaryToGetParams(parameters);
+            Debug.Print("GET url: " + url);
+            var response = client.GetAsync(url);
+            return response.Result.Content.ReadAsStringAsync().Result;
+        }
+
+        private string DictionaryToGetParams(Dictionary<string, string> parameters) {
+            string ret = "";
+            int index = 0;
+            foreach (var p in parameters) {
+                ret += (p.Key + "=" + p.Value);
+                if (++index < parameters.Count) {
+                    ret += "&";
+                }
             }
             return ret;
         }
 
         //Overload function to make a call without any additional POST parameters
-        private string GetJSONResponse(string function) {
-            return GetJSONResponse(function, new Dictionary<string, string>());
+        private string PostJSONResponse(string function) {
+            return PostJSONResponse(function, new Dictionary<string, string>());
         }
 
-        private string GetJSONResponse(string function, Dictionary<string, string> parameters) {
+        private string PostJSONResponse(string function, Dictionary<string, string> parameters) {
             //provides an option to parse public data
             if (apiKey != null) {
-                string nonce = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+                //multiplying by 100.000 in case the API key is used on another computer with milis timestamp
+                string nonce = (DateTimeOffset.Now.ToUnixTimeSeconds() * 100000).ToString();
                 string signature = CreateSignature(nonce);
                 //Add required auth parameters
                 parameters.Add("key", apiKey);

@@ -10,10 +10,10 @@
             <PropertyRef Name="tid" />
           </Key>
           <Property Name="tid" Type="int" Nullable="false" />
-          <Property Name="date" Type="timestamp" StoreGeneratedPattern="Computed" Nullable="false" />
+          <Property Name="date" Type="int" Nullable="false" />
           <Property Name="price" Type="decimal" Precision="18" Scale="4" Nullable="false" />
           <Property Name="amount" Type="decimal" Precision="18" Scale="4" Nullable="false" />
-          <Property Name="type" Type="bit" Nullable="false" />
+          <Property Name="type" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="Transactions">
           <Key>
@@ -24,9 +24,9 @@
           <Property Name="usd" Type="decimal" Precision="18" Scale="4" Nullable="false" />
           <Property Name="eur" Type="decimal" Precision="18" Scale="4" Nullable="false" />
           <Property Name="btc" Type="decimal" Precision="18" Scale="4" Nullable="false" />
-          <Property Name="btc_usd" Type="nchar" MaxLength="10" Nullable="false" />
           <Property Name="fee" Type="decimal" Precision="18" Scale="4" Nullable="false" />
           <Property Name="order_id" Type="int" Nullable="false" />
+          <Property Name="type" Type="int" Nullable="false" />
         </EntityType>
         <EntityContainer Name="TransactionHistoriesModelStoreContainer">
           <EntitySet Name="PublicTransactions" EntityType="Self.PublicTransactions" Schema="dbo" store:Type="Tables" />
@@ -49,19 +49,19 @@
           <Property Name="usd" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
           <Property Name="eur" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
           <Property Name="btc" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
-          <Property Name="btc_usd" Type="String" Nullable="false" MaxLength="10" FixedLength="true" Unicode="true" />
           <Property Name="fee" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
           <Property Name="order_id" Type="Int32" Nullable="false" />
+          <Property Name="type" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="PublicTransaction">
           <Key>
             <PropertyRef Name="tid" />
           </Key>
           <Property Name="tid" Type="Int32" Nullable="false" />
-          <Property Name="date" Type="Binary" Nullable="false" MaxLength="8" FixedLength="true" annotation:StoreGeneratedPattern="Computed" />
           <Property Name="price" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
           <Property Name="amount" Type="Decimal" Nullable="false" Precision="18" Scale="4" />
-          <Property Name="type" Type="Boolean" Nullable="false" />
+          <Property Name="type" Type="Int32" Nullable="false" />
+          <Property Name="date" Type="Int32" Nullable="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -72,9 +72,9 @@
           <EntitySetMapping Name="Transactions">
             <EntityTypeMapping TypeName="TransactionHistoriesModel.Transaction">
               <MappingFragment StoreEntitySet="Transactions">
+                <ScalarProperty Name="type" ColumnName="type" />
                 <ScalarProperty Name="order_id" ColumnName="order_id" />
                 <ScalarProperty Name="fee" ColumnName="fee" />
-                <ScalarProperty Name="btc_usd" ColumnName="btc_usd" />
                 <ScalarProperty Name="btc" ColumnName="btc" />
                 <ScalarProperty Name="eur" ColumnName="eur" />
                 <ScalarProperty Name="usd" ColumnName="usd" />
@@ -86,10 +86,10 @@
           <EntitySetMapping Name="PublicTransactions">
             <EntityTypeMapping TypeName="TransactionHistoriesModel.PublicTransaction">
               <MappingFragment StoreEntitySet="PublicTransactions">
+                <ScalarProperty Name="date" ColumnName="date" />
                 <ScalarProperty Name="type" ColumnName="type" />
                 <ScalarProperty Name="amount" ColumnName="amount" />
                 <ScalarProperty Name="price" ColumnName="price" />
-                <ScalarProperty Name="date" ColumnName="date" />
                 <ScalarProperty Name="tid" ColumnName="tid" />
               </MappingFragment>
             </EntityTypeMapping>

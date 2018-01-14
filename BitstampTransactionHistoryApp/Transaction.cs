@@ -19,8 +19,8 @@ namespace BitstampTransactionHistoryApp
         public decimal usd { get; set; }
         public decimal eur { get; set; }
         public decimal btc { get; set; }
-        public string btc_usd { get; set; }
         public decimal fee { get; set; }
         public int order_id { get; set; }
+        public int type { get; set; }
     }
 }
